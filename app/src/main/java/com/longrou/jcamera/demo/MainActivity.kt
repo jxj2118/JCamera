@@ -15,7 +15,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         text.text = "请按下拍照按钮\nPlease pressed camera button"
         fab.setOnClickListener {
-            JCamera.instance.setMaxRecordTime(3).start(this,PHOTO_OR_VIDEO_FOR_CAMERA)
+            //如不设置 会默认打开上一次配置的结果
+            JCamera.instance
+                //.openPreCamera()// 是否打开为前置摄像头
+                .allowPhoto(true)// 是否允许拍照 默认允许
+                .allowRecord(true)// 是否允许录像 默认允许
+                .setMaxRecordTime(3)//最长录像时间 秒
+                .start(this,PHOTO_OR_VIDEO_FOR_CAMERA)//PHOTO_OR_VIDEO_FOR_CAMERA 请求码 回调时可用
         }
     }
 
