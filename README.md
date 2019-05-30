@@ -46,6 +46,16 @@ Step 2. Add the dependency
 dependencies {
         implementation 'com.github.jxj2118:JCamera:v1.0.0'
 }
+
+```
+Step 3. Need Open DataBinding (PS. Follow-up consideration remove)
+```groovy
+android {
+        ...
+        dataBinding {
+                enabled true
+        }
+}
 ```
 
 ## Usage
