@@ -44,7 +44,7 @@ allprojects {
 Step 2. Add the dependency
 ```groovy
 dependencies {
-        implementation 'com.github.jxj2118:JCamera:v1.0.0
+        implementation 'com.github.jxj2118:JCamera:v1.0.0'
 }
 ```
 
