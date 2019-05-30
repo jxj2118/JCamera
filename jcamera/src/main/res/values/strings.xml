@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">JCamera</string>
+    <string name="photo_tip">轻触拍照</string>
+    <string name="record_tip">长按摄像</string>
+    <string name="no_permission_tip">拍摄需要内存卡使用权限和摄像头使用权限</string>
+    <string name="open_camera_error_tip">打开相机失败</string>
+    <string name="record_time_short">录制时间过短</string>
+</resources>

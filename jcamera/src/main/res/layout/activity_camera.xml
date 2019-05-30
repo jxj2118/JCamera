@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="false">
+    <data>
+        <import type="android.view.View"/>
+        <import type="com.longrou.jcamera.CameraActivity"/>
+        <variable
+            name="activity"
+            type="com.longrou.jcamera.CameraActivity"/>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black">
+        <com.longrou.jcamera.view.AutoFitTextureView
+            android:id="@+id/mTextureView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW ? View.VISIBLE:View.GONE}"
+            android:onClick="@{()->activity.changeCamera()}"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="80dp"
+            android:src="@mipmap/ic_camera_rotate"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:visibility="@{safeUnbox(activity.state) == 0 ? View.VISIBLE:View.GONE}"
+            android:id="@+id/mTvRecordTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:textColor="#ffffffff"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/mBtnRecord"/>
+        <com.longrou.jcamera.view.CircleProgressButton
+            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW || safeUnbox(activity.state) == CameraActivity.STATE_RECORDING ? View.VISIBLE:View.GONE}"
+            android:id="@+id/mBtnRecord"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="70dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <ImageView
+            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW ? View.VISIBLE:View.GONE}"
+            android:id="@+id/mBack"
+            android:onClick="@{()->activity.onBackPressed()}"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="80dp"
+            android:layout_marginRight="240dp"
+            android:src="@mipmap/ic_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <LinearLayout
+            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PICTURE_TAKEN || safeUnbox(activity.state) == CameraActivity.STATE_RECORD_TAKEN ? View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <ImageView
+                android:id="@+id/mBtnCancel"
+                android:onClick="@{()->activity.unlockFocus()}"
+                android:layout_gravity="center"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginRight="80dp"
+                android:src="@mipmap/ic_cancel" />
+            <ImageView
+                android:id="@+id/mBtnOK"
+                android:onClick="@{()->activity.captureResult()}"
+                android:layout_gravity="center"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="80dp"
+                android:src="@mipmap/ic_ok" />
+        </LinearLayout>
+
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

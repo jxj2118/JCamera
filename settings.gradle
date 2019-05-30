@@ -1,0 +1,2 @@
+include ':app', ':jcameralib'
+project(':jcameralib').projectDir = new File('jcamera')
