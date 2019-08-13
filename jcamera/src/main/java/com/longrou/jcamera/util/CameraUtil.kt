@@ -1,6 +1,7 @@
 package com.longrou.jcamera.util
 
 import android.hardware.camera2.CameraCharacteristics
+import android.util.Log
 import android.util.Size
 import com.longrou.jcamera.CameraActivity
 import java.util.*
@@ -17,17 +18,29 @@ class CameraUtil {
          * 获取最大匹配输出尺寸
          */
         fun getMaxOptimalSize(cameraCharacteristics: CameraCharacteristics, clazz: Class<*>, maxWidth: Int, maxHeight: Int): Size? {
-            val aspectRatio = maxWidth.toFloat() / maxHeight
+            val aspectRatio = maxWidth.toFloat() / maxHeight.toFloat()
             val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             val supportedSizes = streamConfigurationMap?.getOutputSizes(clazz)
             val sizeList = mutableListOf<Size>()
+            // 优化算法， 取最offset
             if (supportedSizes != null) {
+                val offsets = mutableSetOf<Float>()
                 for (size in supportedSizes) {
-                    val offset = (size.width.toFloat() / size.height - aspectRatio)
-                    if (Math.abs(offset) < 0.05f && (size.height <= maxHeight || size.width <= maxWidth) && (size.height >= 640 || size.width >= 480)) {
-                        sizeList.add(size)
+                    val offset = (size.width.toFloat() / size.height.toFloat() - aspectRatio)
+                    offsets.add(Math.abs(offset))
+                }
+                if (offsets.isNotEmpty()){
+                    var minOffset = offsets.min()
+                    for (size in supportedSizes) {
+                        val offset = (size.width.toFloat() / size.height.toFloat() - aspectRatio)
+                        if (Math.abs(offset) == minOffset && (size.height <= maxHeight || size.width <= maxWidth) && (size.height >= 640 || size.width >= 480)) {
+                            sizeList.add(size)
+                        }
                     }
                 }
+            }
+            if (sizeList.isNullOrEmpty()){
+                return null
             }
             return Collections.max(sizeList, CameraActivity.CompareSizesByArea())
         }
@@ -40,12 +53,23 @@ class CameraUtil {
             val supportedSizes = streamConfigurationMap?.getOutputSizes(clazz)
             val sizeList = mutableListOf<Size>()
             if (supportedSizes != null) {
+                val offsets = mutableSetOf<Float>()
                 for (size in supportedSizes) {
                     val offset = (size.width.toFloat() / size.height - aspectRatio)
-                    if (Math.abs(offset) < 0.05f && (size.height <= maxHeight || size.width <= maxWidth) && (size.height >= 640 || size.width >= 480)) {
-                        sizeList.add(size)
+                    offsets.add(Math.abs(offset))
+                }
+                if (offsets.isNotEmpty()) {
+                    var minOffset = offsets.min()
+                    for (size in supportedSizes) {
+                        val offset = (size.width.toFloat() / size.height - aspectRatio)
+                        if (Math.abs(offset) == offset && (size.height <= maxHeight || size.width <= maxWidth) && (size.height >= 1280 || size.width >= 960)) {
+                            sizeList.add(size)
+                        }
                     }
                 }
+            }
+            if (sizeList.isNullOrEmpty()){
+                return null
             }
             return Collections.min(sizeList, CameraActivity.CompareSizesByArea())
         }

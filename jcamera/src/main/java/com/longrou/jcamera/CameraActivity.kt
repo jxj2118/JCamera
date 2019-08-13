@@ -73,8 +73,8 @@ class CameraActivity : AppCompatActivity() {
 
     private val MAX_PREVIEW_WIDTH = lazy { (ScreenUtil.getScreenHeight(this)) }
     private val MAX_PREVIEW_HEIGHT = lazy { (ScreenUtil.getScreenWidth(this)) }
-    private val MIN_RECORD_WIDHT = 480
-    private val MIN_RECORD_HEIGHT = 640
+    private val MIN_RECORD_WIDHT = 960
+    private val MIN_RECORD_HEIGHT = 1280
 
     private lateinit var cameraManager: CameraManager
     private lateinit var previewSession: CameraCaptureSession
@@ -314,8 +314,20 @@ class CameraActivity : AppCompatActivity() {
                     CameraConfig.FRONT_CAMERA_ID = cId
                     CameraConfig.FRONT_CAMERA_CHARACTERISTIC = cameraCharacteristics
                 } else if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == CameraCharacteristics.LENS_FACING_BACK) {
-                    CameraConfig.BACK_CAMERA_ID = cId
-                    CameraConfig.BACK_CAMERA_CHARACTERISTIC = cameraCharacteristics
+                    Log.e(TAG,"cId :$cId LENS_FACING_BACK $cameraCharacteristics")
+                    val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                    val supportedSizes = streamConfigurationMap?.getOutputSizes(SurfaceTexture::class.java)
+                    if (supportedSizes != null) {
+                        for (size in supportedSizes) {
+                            val aspectRatio = (size.width.toFloat() / size.height.toFloat())
+                            Log.e("CameraUtil","aspectRatio $aspectRatio - width ${size.width.toFloat()} - height ${ size.height.toFloat()}")
+                        }
+                    }
+                    if (CameraConfig.BACK_CAMERA_ID.isBlank()){
+                        // 多后摄像头 取第一个
+                        CameraConfig.BACK_CAMERA_ID = cId
+                        CameraConfig.BACK_CAMERA_CHARACTERISTIC = cameraCharacteristics
+                    }
                 }
             }
             CameraConfig.init = true
