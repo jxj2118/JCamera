@@ -38,6 +38,8 @@ class CameraConfig {
         var IS_ALLOW_RECORD : Boolean = true
         //是否允许录拍照
         var IS_ALLOW_PHOTO : Boolean = true
+        //视频质量 主要是配置帧率 范围定在 1 - 100
+        var RECORD_QUALITY : Int = 30
 
         var test = 0
 

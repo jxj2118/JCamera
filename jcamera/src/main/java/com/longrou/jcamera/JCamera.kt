@@ -41,6 +41,18 @@ class JCamera {
         CameraConfig.IS_ALLOW_PHOTO = boolean
         return this
     }
+
+    /**
+     * 设置视频质量 1 - 100
+     */
+    fun setRecordQuality(quality: Int):JCamera{
+        if (quality in 1..100){
+            CameraConfig.RECORD_QUALITY = quality
+        }else{
+            CameraConfig.RECORD_QUALITY = 30
+        }
+        return this
+    }
     fun start(activity: Activity,requestCode: Int){
         val intent = Intent(activity, CameraActivity::class.java)
         activity.startActivityForResult(intent, requestCode)

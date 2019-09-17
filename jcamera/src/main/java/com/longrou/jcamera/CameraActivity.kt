@@ -16,7 +16,6 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.util.Size
-import android.util.SparseIntArray
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
@@ -39,9 +38,7 @@ import com.longrou.jcamera.view.CircleProgressButton
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
 import java.lang.Long.signum
-import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -314,13 +311,13 @@ class CameraActivity : AppCompatActivity() {
                     CameraConfig.FRONT_CAMERA_ID = cId
                     CameraConfig.FRONT_CAMERA_CHARACTERISTIC = cameraCharacteristics
                 } else if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == CameraCharacteristics.LENS_FACING_BACK) {
-                    Log.e(TAG,"cId :$cId LENS_FACING_BACK $cameraCharacteristics")
+                    // Log.e(TAG,"cId :$cId LENS_FACING_BACK $cameraCharacteristics")
                     val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                     val supportedSizes = streamConfigurationMap?.getOutputSizes(SurfaceTexture::class.java)
                     if (supportedSizes != null) {
                         for (size in supportedSizes) {
                             val aspectRatio = (size.width.toFloat() / size.height.toFloat())
-                            Log.e("CameraUtil","aspectRatio $aspectRatio - width ${size.width.toFloat()} - height ${ size.height.toFloat()}")
+                            // Log.e("CameraUtil","aspectRatio $aspectRatio - width ${size.width.toFloat()} - height ${ size.height.toFloat()}")
                         }
                     }
                     if (CameraConfig.BACK_CAMERA_ID.isBlank()){
@@ -742,25 +739,32 @@ class CameraActivity : AppCompatActivity() {
                         } else {
                             uri = Uri.fromFile(File(comRecordPath))
                         }
-                        mediaPlayer.setDataSource(this@CameraActivity, uri)
-                        //AudioAttributes是一个封装音频各种属性的类
-                        val attrBuilder = AudioAttributes.Builder()
-                        //************************************* 横向拍摄需要修改preview显示方向
-                        if (recordOrientation == 90 || recordOrientation == 270){
-                            setHorizontalPreview()
-                        }
-                        //*************************************
-                        //设置音频流的合适属性
-                        attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                        mediaPlayer.setAudioAttributes(attrBuilder.build())
-                        mediaPlayer.setSurface(Surface(binding.mTextureView.surfaceTexture))
-                        mediaPlayer.setOnPreparedListener {
-                            mediaPlayer.isLooping = true
-                            mediaPlayer.start()
-                            //移除原视频
+                        //还没开始预览便退出 mediaPlayer处于end状态则清除数据
+                        try {
+                            mediaPlayer.setDataSource(this@CameraActivity, uri)
+                            //AudioAttributes是一个封装音频各种属性的类
+                            val attrBuilder = AudioAttributes.Builder()
+                            //************************************* 横向拍摄需要修改preview显示方向
+                            if (recordOrientation == 90 || recordOrientation == 270){
+                                setHorizontalPreview()
+                            }
+                            //*************************************
+                            //设置音频流的合适属性
+                            attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                            mediaPlayer.setAudioAttributes(attrBuilder.build())
+                            mediaPlayer.setSurface(Surface(binding.mTextureView.surfaceTexture))
+                            mediaPlayer.setOnPreparedListener {
+                                mediaPlayer.isLooping = true
+                                mediaPlayer.start()
+                                //移除原视频
+                                File(recordPath).delete()
+                            }
+                            mediaPlayer.prepare()
+                        }catch (e: IllegalStateException){
+                            //移除临时文件
+                            File(comRecordPath).delete()
                             File(recordPath).delete()
                         }
-                        mediaPlayer.prepare()
                     }
                 }).start()
             }catch (e: Exception){
@@ -797,7 +801,7 @@ class CameraActivity : AppCompatActivity() {
             setVideoSource(MediaRecorder.VideoSource.SURFACE)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setOutputFile(recordPath)
-            setVideoEncodingBitRate(1024 * 1024)
+            setVideoEncodingBitRate(1024 * 1024 * CameraConfig.RECORD_QUALITY)
             setVideoFrameRate(30)
             setMaxDuration(CameraConfig.MAX_RECORD_TIME * 1000)
             setVideoSize(recordSize.width, recordSize.height)

@@ -31,6 +31,13 @@ Android 仿微信视频拍摄 支持触摸拍摄 长按拍摄，采用camera2，
 <br>
 <a href="art/app-debug.apk">点击下载</a>
 
+## Version
+2018-9-17 V1.0.2 增加视频质量设置，解决录像未完成销毁Activity崩溃的BUG
+<br>
+2018-8-13 V1.0.1 优化尺寸匹配算法，多摄像头匹配，解决华为设备崩溃
+<br>
+2018-5-30 V1.0.0
+
 ## Gradle
 Step 1. Add the JitPack repository to your build file
 ```groovy
@@ -44,7 +51,7 @@ allprojects {
 Step 2. Add the dependency
 ```groovy
 dependencies {
-        implementation 'com.github.jxj2118:JCamera:v1.0.0'
+        implementation 'com.github.jxj2118:JCamera:v1.0.2'
 }
 
 ```
@@ -68,6 +75,7 @@ android {
             .allowPhoto(true)// 是否允许拍照 默认允许
             .allowRecord(true)// 是否允许录像 默认允许
             .setMaxRecordTime(3)//最长录像时间 秒
+            .setRecordQuality(30)//设置视频质量 1-100 默认30
             .start(this,PHOTO_OR_VIDEO_FOR_CAMERA)//PHOTO_OR_VIDEO_FOR_CAMERA 请求码 回调时可用
 ```
 
