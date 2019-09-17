@@ -32,11 +32,11 @@ Android 仿微信视频拍摄 支持触摸拍摄 长按拍摄，采用camera2，
 <a href="art/app-debug.apk">点击下载</a>
 
 ## Version
-2018-9-17 V1.0.2 增加视频质量设置，解决录像未完成销毁Activity崩溃的BUG
+2019-9-17 V1.0.2 增加视频质量设置，解决录像未完成销毁Activity崩溃的BUG
 <br>
-2018-8-13 V1.0.1 优化尺寸匹配算法，多摄像头匹配，解决华为设备崩溃
+2019-8-13 V1.0.1 优化尺寸匹配算法，多摄像头匹配，解决华为设备崩溃
 <br>
-2018-5-30 V1.0.0
+2019-5-30 V1.0.0
 
 ## Gradle
 Step 1. Add the JitPack repository to your build file
