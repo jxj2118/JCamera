@@ -32,6 +32,8 @@ Android 仿微信视频拍摄 支持触摸拍摄 长按拍摄，采用camera2，
 <a href="art/app-debug.apk">点击下载</a>
 
 ## Version
+2019-11-25 V1.0.4 com.android.tools.build:gradle:3.4.2 -> 3.5.2 , 修复视频处理前可点击确定的BUG, 修复按钮时长与录制时长不匹配的BUG
+<br>
 2019-9-17 V1.0.2 增加视频质量设置，解决录像未完成销毁Activity崩溃的BUG
 <br>
 2019-8-13 V1.0.1 优化尺寸匹配算法，多摄像头匹配，解决华为设备崩溃
@@ -51,7 +53,7 @@ allprojects {
 Step 2. Add the dependency
 ```groovy
 dependencies {
-        implementation 'com.github.jxj2118:JCamera:v1.0.2'
+        implementation 'com.github.jxj2118:JCamera:v1.0.4'
 }
 
 ```

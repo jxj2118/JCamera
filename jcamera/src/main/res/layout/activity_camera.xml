@@ -28,17 +28,6 @@
             android:src="@mipmap/ic_camera_rotate"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-        <TextView
-            android:visibility="@{safeUnbox(activity.state) == 0 ? View.VISIBLE:View.GONE}"
-            android:id="@+id/mTvRecordTip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:textColor="#ffffffff"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/mBtnRecord"/>
         <com.longrou.jcamera.view.CircleProgressButton
             android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW || safeUnbox(activity.state) == CameraActivity.STATE_RECORDING ? View.VISIBLE:View.GONE}"
             android:id="@+id/mBtnRecord"
@@ -48,6 +37,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
+        <TextView
+                android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW ? View.VISIBLE:View.GONE}"
+                android:id="@+id/mTvRecordTip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:textColor="#ffffffff"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/mBtnRecord"/>
         <ImageView
             android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PREVIEW ? View.VISIBLE:View.GONE}"
             android:id="@+id/mBack"
@@ -61,7 +61,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
         <LinearLayout
-            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PICTURE_TAKEN || safeUnbox(activity.state) == CameraActivity.STATE_RECORD_TAKEN ? View.VISIBLE:View.GONE}"
+            android:visibility="@{safeUnbox(activity.state) == CameraActivity.STATE_PICTURE_TAKEN || safeUnbox(activity.state) == CameraActivity.STATE_RECORD_PROCESS || safeUnbox(activity.state) == CameraActivity.STATE_RECORD_TAKEN ? View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="80dp"

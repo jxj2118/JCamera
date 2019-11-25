@@ -129,6 +129,7 @@ class CameraActivity : AppCompatActivity() {
     private var comRecordPath: String = ""
     private lateinit var mediaRecorder: MediaRecorder
     private lateinit var mediaPlayer: MediaPlayer
+    private var mp4Composer: Mp4Composer? = null
     /**
      * Preview
      */
@@ -174,6 +175,7 @@ class CameraActivity : AppCompatActivity() {
             }
         }
         binding = DataBindingUtil.setContentView<ActivityCameraBinding>(this, R.layout.activity_camera)
+        binding.mBtnRecord.processSec = CameraConfig.MAX_RECORD_TIME
         binding.activity = this
         init()
     }
@@ -500,7 +502,19 @@ class CameraActivity : AppCompatActivity() {
                 matrix.postTranslate(0f, 0f)
                 binding.mTextureView.setTransform(matrix)
                 openCamera()
-            } else {
+            } else if (state.get() == STATE_RECORD_PROCESS){
+                //还在处理视频 还未开始播放
+                mp4Composer?.cancel()
+
+                File(comRecordPath).delete()
+                //预览视图恢复默认
+                val matrix = Matrix()
+                binding.mTextureView.getTransform(matrix)
+                matrix.setScale(1f,  1f)
+                matrix.postTranslate(0f, 0f)
+                binding.mTextureView.setTransform(matrix)
+                openCamera()
+            }else {
                 // Reset the auto-focus trigger
                 if(cameraDevice == null){
                     openCamera()
@@ -716,7 +730,8 @@ class CameraActivity : AppCompatActivity() {
     private fun stopRecord() {
         sessionOpenCloseLock.acquire()
         if (state.get() == STATE_RECORDING) {
-            state.set(STATE_RECORD_TAKEN)
+            //临界状态
+            state.set(STATE_RECORD_PROCESS)
             showBtnLayout()
             try {
                 mediaRecorder.stop()
@@ -725,14 +740,18 @@ class CameraActivity : AppCompatActivity() {
                 mediaPlayer.reset()
                 var isBackCamera = CameraConfig.last_camera_id == CameraConfig.BACK_CAMERA_ID
                 //解决镜像问题
-                Mp4Composer(recordPath,comRecordPath).rotation(correctRecord()).flipHorizontal(!isBackCamera).listener(object : Mp4Composer.Listener{
+                mp4Composer = Mp4Composer(recordPath,comRecordPath)
+                    .rotation(correctRecord()).flipHorizontal(!isBackCamera).listener(object : Mp4Composer.Listener{
                     override fun onFailed(exception: Exception?) {
+                        exception?.printStackTrace()
                     }
                     override fun onProgress(progress: Double) {
                     }
                     override fun onCanceled() {
                     }
                     override fun onCompleted() {
+                        //任务被取消
+                        if (state.get() != STATE_RECORD_PROCESS){return}
                         val uri: Uri
                         if (Build.VERSION.SDK_INT >= 24) {
                             uri = FileProvider.getUriForFile(this@CameraActivity, CameraProvider.getFileProviderName(this@CameraActivity), File(comRecordPath))
@@ -760,7 +779,10 @@ class CameraActivity : AppCompatActivity() {
                                 File(recordPath).delete()
                             }
                             mediaPlayer.prepare()
-                        }catch (e: IllegalStateException){
+
+                            state.set(STATE_RECORD_TAKEN)
+
+                        }catch (e: Exception){
                             //移除临时文件
                             File(comRecordPath).delete()
                             File(recordPath).delete()
@@ -768,7 +790,7 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }).start()
             }catch (e: Exception){
-                //e.printStackTrace()
+                e.printStackTrace()
                 Toast.makeText(this@CameraActivity, getString(R.string.record_time_short), Toast.LENGTH_SHORT).show()
                 File(recordPath).delete()
                 previewSession.apply {
@@ -868,7 +890,7 @@ class CameraActivity : AppCompatActivity() {
             rightAction.duration = 200
         }
 
-        private const val TAG = "CameraActivity"
+        private const val TAG = "CameraActivityTAG"
         /**
          * Camera state: 预览相机
          */
@@ -884,9 +906,13 @@ class CameraActivity : AppCompatActivity() {
          */
         const val STATE_RECORDING = 0x00000002
         /**
+         * Camera state: 处理录像
+         */
+        const val STATE_RECORD_PROCESS = 0x00000003
+        /**
          * Camera state: 捕获录像
          */
-        const val STATE_RECORD_TAKEN = 0x00000003
+        const val STATE_RECORD_TAKEN = 0x00000004
 
 
         private fun getDate(): String {
